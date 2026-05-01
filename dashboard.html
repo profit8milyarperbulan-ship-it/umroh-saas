@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Ads Dashboard</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .big {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    #status {
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    img {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>📊 Ads Dashboard</h2>
+
+<div id="status">⏳ Loading data...</div>
+
+<div class="grid">
+  <div class="card">
+    Total Ads
+    <div id="total" class="big">0</div>
+  </div>
+
+  <div class="card">
+    Top Brand
+    <div id="brand" class="big">-</div>
+  </div>
+
+  <div class="card">
+    Avg Copy
+    <div id="avg" class="big">0</div>
+  </div>
+</div>
+
+<div id="list"></div>
+
+<script>
+
+// ======================
+// LOAD DATA
+// ======================
+chrome.storage.local.get("adsData", (res) => {
+
+  const data = res.adsData || [];
+
+  // DEBUG INFO
+  const status = document.getElementById("status");
+
+  if (!res.adsData) {
+    status.innerText = "❌ Tidak ada data (belum klik Load Data / Dashboard)";
+    return;
+  }
+
+  if (data.length === 0) {
+    status.innerText = "⚠️ Data kosong (scan belum dapet)";
+    return;
+  }
+
+  status.innerText = `✅ Data loaded: ${data.length} ads`;
+
+  // ======================
+  // SUMMARY
+  // ======================
+  document.getElementById("total").innerText = data.length;
+
+  // TOP BRAND
+  const brands = {};
+  data.forEach(a => {
+    brands[a.brand] = (brands[a.brand] || 0) + 1;
+  });
+
+  const sorted = Object.entries(brands).sort((a,b)=>b[1]-a[1]);
+  document.getElementById("brand").innerText = sorted[0]?.[0] || "-";
+
+  // AVG COPY
+  const avg = data.reduce((s,a)=>s+(a.body?.length||0),0)/(data.length||1);
+  document.getElementById("avg").innerText = Math.round(avg);
+
+  // ======================
+  // LIST IKLAN
+  // ======================
+  const list = document.getElementById("list");
+
+  data.slice(0,50).forEach(ad => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <b>${ad.brand}</b><br>
+      ${ad.headline}<br>
+      <small>${ad.body}</small><br>
+      ${ad.image ? `<img src="${ad.image}">` : ""}
+    `;
+
+    list.appendChild(div);
+  });
+
+});
+
+</script>
+
+</body>
+</html>
