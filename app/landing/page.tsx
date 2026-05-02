@@ -3,60 +3,74 @@
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// ✅ CONFIG PUNYA NDORO
 const supabase = createClient(
   "https://vpenzzxmmnaclvkrclwv.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZW56enhtbW5hY2x2a3JjbHd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MTk0OTksImV4cCI6MjA5MzE5NTQ5OX0.1hTuTG8Y3vhopYgSvDnAPpYRkmSoGjOkrK8DCrmAFGY"
 );
 
 export default function LandingPage() {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    alert("🔥 BUTTON KEKLIK"); // TEST CLICK
 
     console.log("🔥 HANDLE SUBMIT KEJALAN");
+    console.log("DATA:", name, phone);
+
+    if (!name || !phone) {
+      alert("Isi dulu nama & nomor WA");
+      return;
+    }
 
     setLoading(true);
 
-    const form = e.target;
-    const name = form.name.value;
-    const phone = form.phone.value;
-
-    console.log("DATA:", name, phone);
-
     const { data, error } = await supabase
       .from("leads")
-      .insert([
-        {
-          name,
-          phone,
-        },
-      ])
-      .select();
+      .insert([{ name, phone }]);
 
     console.log("HASIL:", data);
     console.log("ERROR:", error);
 
+    setLoading(false);
+
     if (error) {
-      alert("❌ Gagal: " + error.message);
+      alert("❌ Gagal masuk: " + error.message);
     } else {
       alert("✅ Data masuk! Tim kami akan hubungi Anda");
-      form.reset();
-    }
 
-    setLoading(false);
+      setName("");
+      setPhone("");
+    }
   };
 
   return (
-    <div>
+    <div style={{ fontFamily: "Arial" }}>
       {/* HEADER */}
-      <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
-        <h2>Travel Barokah</h2>
-        <small>Sistem Umroh</small>
+      <div
+        style={{
+          padding: "16px",
+          borderBottom: "1px solid #ddd",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>
+          <b>Travel Barokah</b>
+          <div style={{ fontSize: "12px" }}>Sistem Umroh</div>
+        </div>
+
+        <div style={{ display: "flex", gap: "16px" }}>
+          <a href="#">Jamaah</a>
+          <a href="#">Booking</a>
+          <a href="#">Payments</a>
+          <a href="#">Dashboard</a>
+          <a href="#">Settings</a>
+        </div>
       </div>
 
-      {/* FORM */}
+      {/* CONTENT */}
       <div
         style={{
           height: "80vh",
@@ -66,50 +80,51 @@ export default function LandingPage() {
           background: "#f5f5f5",
         }}
       >
-        <form
-          onSubmit={(e) => handleSubmit(e)}
+        <div
           style={{
+            width: "350px",
             background: "#fff",
-            padding: "30px",
+            padding: "24px",
             borderRadius: "8px",
-            width: "300px",
             boxShadow: "0 0 10px rgba(0,0,0,0.1)",
           }}
         >
-          <h3 style={{ marginBottom: "20px" }}>
+          <h3 style={{ textAlign: "center" }}>
             Daftar Umroh Sekarang ✨
           </h3>
 
           <input
-            name="name"
+            type="text"
             placeholder="Nama"
-            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             style={{
               width: "100%",
               padding: "10px",
-              marginBottom: "10px",
-              border: "1px solid #ccc",
+              marginTop: "10px",
             }}
           />
 
           <input
-            name="phone"
+            type="text"
             placeholder="No WhatsApp"
-            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             style={{
               width: "100%",
               padding: "10px",
-              marginBottom: "15px",
-              border: "1px solid #ccc",
+              marginTop: "10px",
             }}
           />
 
           <button
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             disabled={loading}
             style={{
               width: "100%",
               padding: "12px",
+              marginTop: "12px",
               background: "green",
               color: "#fff",
               border: "none",
@@ -118,7 +133,7 @@ export default function LandingPage() {
           >
             {loading ? "Mengirim..." : "Daftar Sekarang"}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
