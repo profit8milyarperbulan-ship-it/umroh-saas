@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// 🔥 GANTI DENGAN PUNYA NDORO
+// 🔥 CONFIG SUDAH DIISI PUNYA NDORO
 const supabase = createClient(
   "https://vpenzzxmmnaclvkrclwv.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZW56enhtbW5hY2x2a3JjbHd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MTk0OTksImV4cCI6MjA5MzE5NTQ5OX0.1hTuTG8Y3vhopYgSvDnAPpYRkmSoGjOkrK8DCrmAFGY"
@@ -16,24 +16,28 @@ export default function LandingPage() {
     e.preventDefault();
     setLoading(true);
 
-    console.log("SUBMIT JALAN");
-
     const name = e.target.name.value;
     const phone = e.target.phone.value;
 
-    const { error } = await supabase.from("leads").insert([
-      {
-        name,
-        phone,
-      },
-    ]);
+    console.log("KIRIM DATA:", name, phone);
 
+    const { data, error } = await supabase
+      .from("leads")
+      .insert([
+        {
+          name,
+          phone,
+        },
+      ])
+      .select();
+
+    console.log("HASIL:", data);
     console.log("ERROR:", error);
 
     if (error) {
-      alert("Gagal menyimpan ❌");
+      alert("❌ Gagal menyimpan: " + error.message);
     } else {
-      alert("Data masuk 👍 Tim kami akan hubungi Anda");
+      alert("✅ Data masuk! Tim kami akan hubungi Anda");
       e.target.reset();
     }
 
@@ -44,7 +48,7 @@ export default function LandingPage() {
     <div>
       {/* HEADER */}
       <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
-        <h2>Nama Travel</h2>
+        <h2>Travel Barokah</h2>
         <small>Sistem Umroh</small>
       </div>
 
