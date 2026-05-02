@@ -1,72 +1,73 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+);
 
 export default function LandingPage() {
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  async function submit() {
-    if (!name || !phone) {
-      alert('Nama & WA wajib diisi')
-      return
-    }
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
 
-    setLoading(true)
+    const name = e.target.name.value;
+    const phone = e.target.phone.value;
 
-    await supabase.from('jamaah').insert([
+    const { error } = await supabase.from("leads").insert([
       {
         name,
         phone,
-        status: 'lead'
-      }
-    ])
+      },
+    ]);
 
-    setLoading(false)
-    setName('')
-    setPhone('')
+    if (error) {
+      alert("Gagal kirim ❌");
+      console.error(error);
+    } else {
+      alert("Data masuk 👍 Tim kami akan hubungi Anda");
+      e.target.reset();
+    }
 
-    alert('Data masuk 👍 Tim kami akan hubungi Anda')
-  }
+    setLoading(false);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 text-black">
-      <div className="bg-white p-6 rounded shadow w-full max-w-md">
+    <div style={{ padding: 40 }}>
+      <h1>Daftar Umroh Sekarang ✨</h1>
 
-        <h1 className="text-xl font-bold mb-4 text-center">
-          Daftar Umroh Sekarang ✨
-        </h1>
-
+      <form onSubmit={handleSubmit} style={{ maxWidth: 400 }}>
         <input
+          name="name"
           placeholder="Nama"
-          value={name}
-          onChange={(e)=>setName(e.target.value)}
-          className="border p-2 w-full mb-2"
+          required
+          style={{ width: "100%", padding: 10, marginBottom: 10 }}
         />
 
         <input
+          name="phone"
           placeholder="No WhatsApp"
-          value={phone}
-          onChange={(e)=>setPhone(e.target.value)}
-          className="border p-2 w-full mb-4"
+          required
+          style={{ width: "100%", padding: 10, marginBottom: 10 }}
         />
 
         <button
-          onClick={submit}
+          type="submit"
           disabled={loading}
-          className="bg-green-600 text-white w-full py-2"
+          style={{
+            width: "100%",
+            padding: 12,
+            background: "green",
+            color: "white",
+          }}
         >
-          {loading ? 'Mengirim...' : 'Daftar Sekarang'}
+          {loading ? "Mengirim..." : "Daftar Sekarang"}
         </button>
-
-      </div>
+      </form>
     </div>
-  )
+  );
 }
