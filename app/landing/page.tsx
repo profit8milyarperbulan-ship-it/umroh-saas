@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// 🔥 CONFIG SUDAH DIISI PUNYA NDORO
+// ✅ CONFIG PUNYA NDORO
 const supabase = createClient(
   "https://vpenzzxmmnaclvkrclwv.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZW56enhtbW5hY2x2a3JjbHd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MTk0OTksImV4cCI6MjA5MzE5NTQ5OX0.1hTuTG8Y3vhopYgSvDnAPpYRkmSoGjOkrK8DCrmAFGY"
@@ -14,12 +14,16 @@ export default function LandingPage() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+
+    console.log("🔥 HANDLE SUBMIT KEJALAN");
+
     setLoading(true);
 
-    const name = e.target.name.value;
-    const phone = e.target.phone.value;
+    const form = e.target;
+    const name = form.name.value;
+    const phone = form.phone.value;
 
-    console.log("KIRIM DATA:", name, phone);
+    console.log("DATA:", name, phone);
 
     const { data, error } = await supabase
       .from("leads")
@@ -35,10 +39,10 @@ export default function LandingPage() {
     console.log("ERROR:", error);
 
     if (error) {
-      alert("❌ Gagal menyimpan: " + error.message);
+      alert("❌ Gagal: " + error.message);
     } else {
       alert("✅ Data masuk! Tim kami akan hubungi Anda");
-      e.target.reset();
+      form.reset();
     }
 
     setLoading(false);
@@ -63,7 +67,7 @@ export default function LandingPage() {
         }}
       >
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => handleSubmit(e)}
           style={{
             background: "#fff",
             padding: "30px",
